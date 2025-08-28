@@ -3,29 +3,33 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 
-RUTA = 'dataset/BASE DE DATOS JULIO.xlsx'
+
+# Crear encabezado para la aplicación en Streamlit
+st.header('Control de calidad - Adulto mayor')
 
 try:
-    df = pd.read_excel(RUTA, header=1)
+    uploaded_file = st.file_uploader("Elige archivo excel")
+    if uploaded_file is not None:
+        df = pd.read_excel(uploaded_file, header=1)
+    else:
+        st.warning("Por favor, sube un archivo para continuar.")
+        st.stop()
 except FileNotFoundError:
     print("El archivo para el control de calidad no se encuentra no se encuentra disponible.")
 else:
     print("El archivo para el control de calidad se ha cargado correctamente.")
 
-
-new_columns = [col.strip().lower().replace(' ', '_') for col in df.columns]
+# Normalizamos los nombres de las columnas
+new_columns = [col.strip().lower().replace(' ', '_')
+               for col in df.columns]
 df.columns = new_columns
-
 # Convertimos la columna 'codigo' a tipo string
 df['codigo'] = df['codigo'].astype(str)
-
 # Obtenemos la lista de puestos de salud
 eess = df['eess'].unique().tolist()
 
+# Filtramos los datos para el personal con código '99801' y edad mayor o igual a 60
 suma_por_eess = df.query("codigo == '99801' and edad >= 60")
-
-# Crear encabezado para la aplicación en Streamlit
-st.header('Control de calidad - Adulto mayor')
 
 puesto_salud = st.pills("Elige puestos de salud", eess,
                         selection_mode="multi", default=eess)
@@ -41,7 +45,7 @@ grouped = grouped.rename(columns={
     'personal': 'Personal',
     'cantidad': 'Cantidad'
 })
-
+# Mostrar gráfico de barras y tabla de datos
+st.bar_chart(grouped, x="Puesto de salud",
+             y="Cantidad", color="Personal", stack=True)
 st.dataframe(grouped)
-st.bar_chart(data=grouped, x='Puesto de salud', y='Cantidad',
-             use_container_width=True, height=400)
