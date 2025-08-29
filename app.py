@@ -3,21 +3,21 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import streamlit as st
 
-
+RUTA = 'https://docs.google.com/spreadsheets/d/1z_vCJml9NvRVCU-RO8SCMFBrfoeQDM6j/export?format=xlsx'
 # Crear encabezado para la aplicación en Streamlit
 st.header('Control de calidad - Adulto mayor')
 
 try:
-    uploaded_file = st.file_uploader("Elige archivo excel")
-    if uploaded_file is not None:
-        df = pd.read_excel(uploaded_file, header=1)
-    else:
-        st.warning("Por favor, sube un archivo para continuar.")
-        st.stop()
+    # uploaded_file = st.file_uploader("Elige archivo excel")
+    # if uploaded_file is not None:
+    #     df = pd.read_excel(uploaded_file, header=1)
+    # else:
+    #     st.warning("Por favor, sube un archivo para continuar.")
+    #     st.stop()
+    df = pd.read_excel(RUTA, header=1)
 except FileNotFoundError:
     print("El archivo para el control de calidad no se encuentra no se encuentra disponible.")
-else:
-    print("El archivo para el control de calidad se ha cargado correctamente.")
+    st.write('Problemas con el archivo, intente más tarde')
 
 # Normalizamos los nombres de las columnas
 new_columns = [col.strip().lower().replace(' ', '_')
@@ -32,7 +32,7 @@ eess = df['eess'].unique().tolist()
 suma_por_eess = df.query("codigo == '99801' and edad >= 60")
 
 puesto_salud = st.pills("Elige puestos de salud", eess,
-                        selection_mode="multi", default=eess)
+                        selection_mode="multi", default=['CHALAMARCA'])
 filtro = suma_por_eess[suma_por_eess['eess'].isin(puesto_salud)]
 
 st.write("Conteo por puesto de salud y personal 'Código 99801'")
