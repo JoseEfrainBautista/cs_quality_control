@@ -32,7 +32,7 @@ eess = df['eess'].unique().tolist()
 suma_por_eess = df.query("codigo == '99801' and edad >= 60")
 
 puesto_salud = st.pills("Elige puestos de salud", eess,
-                        selection_mode="multi", default=['CHALAMARCA'])
+                        selection_mode="multi", default=eess)
 filtro = suma_por_eess[suma_por_eess['eess'].isin(puesto_salud)]
 
 st.write("Conteo por puesto de salud y personal 'Código 99801'")
